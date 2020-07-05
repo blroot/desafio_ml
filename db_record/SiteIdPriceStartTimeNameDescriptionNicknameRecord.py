@@ -1,6 +1,9 @@
 from db_record.DBRecord import DBRecord
 from csvupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
+from typing import Iterable, List, Tuple, Dict
 import requests
+import asyncio
+import aiohttp
 
 
 class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
@@ -28,14 +31,16 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         self.price = float(item['body']['price'])
         self.start_time = item['body']['start_time']
 
-        currency = requests.get("https://api.mercadolibre.com/currencies/" + item['body']['currency_id']).json()
-        self.description = currency['description']
+        currency_url = "https://api.mercadolibre.com/currencies/" + item['body']['currency_id']
+        category_url = "https://api.mercadolibre.com/categories/" + item['body']['category_id']
+        user_url = "https://api.mercadolibre.com/users/" + str(item['body']['seller_id'])
 
-        category = requests.get("https://api.mercadolibre.com/categories/" + item['body']['category_id']).json()
-        self.name = category['name']
+        async_request = asyncio.run(request_aio([currency_url, category_url, user_url]))
 
-        user = requests.get("https://api.mercadolibre.com/users/" + str(item['body']['seller_id'])).json()
-        self.nickname = user['nickname']
+        self.description = async_request[currency_url]['description']
+        self.name = async_request[category_url]['name']
+        self.nickname = async_request[user_url]['nickname']
+
         return True
 
     def _transform_site(self) -> bool:
@@ -62,3 +67,16 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         )
         db.session.add(new_record)
         db.session.commit()
+
+
+async def request_aio(urls: Iterable[str]) -> Dict:
+    results = {}
+
+    async def request(url: str) -> None:
+        async with aiohttp.ClientSession() as s:
+            resp = await s.get(url)
+            out = await resp.json()
+            results[url] = out
+
+    await asyncio.gather(*[request(url) for url in urls])
+    return results

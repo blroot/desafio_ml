@@ -3,3 +3,4 @@ flask-sqlalchemy
 python-dotenv
 psycopg2
 requests
+aiohttp
