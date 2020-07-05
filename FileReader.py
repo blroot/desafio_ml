@@ -1,24 +1,30 @@
+from flask import current_app as app
 import string
 import random
 
 
 class FileReader:
-    def __init__(self, config, parser_factory):
+    def __init__(self, parser_factory, record_format):
         self.file_name = ''.join(random.choice(string.ascii_letters) for i in range(10))
-        self.chunk_size = int(config['file_reader']['chunk_size'])
-        self.file_path = config['file_reader']['file_path']
-        self.reader = parser_factory.get_parser(config['file_reader']['type'])
+        self.chunk_size = app.config.get("CHUNK_SIZE")
+        self.file_path = app.config.get("FILE_PATH")
+        self.parser = parser_factory.get_parser(app.config.get("FILE_TYPE"))()
+        self.record_format = record_format
 
     def upload(self, request):
+        file = request.files['file']
+        file.save(self.file_path + self.file_name)
+        """
         with open(self.file_path + self.file_name, "bw") as f:
             while True:
                 chunk = request.stream.read(int(self.chunk_size))
                 if len(chunk) == 0:
                     return
                 f.write(chunk)
+        """
 
     def read_line(self):
         with open(self.file_path + self.file_name, "r") as f:
-            reader = self.reader(f)
+            reader = self.parser.reader(f)
             for row in reader:
-                yield row
+                yield self.parser.build_record(row, self.record_format)
