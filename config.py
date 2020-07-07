@@ -15,6 +15,7 @@ class Config:
     FILE_PATH = environ.get('FILE_PATH')
     CHUNK_SIZE = int(environ.get('CHUNK_SIZE'))
     FILE_TYPE = environ.get('FILE_TYPE')
+    ASYNC_REQUESTS_SEMAPHORE = int(environ.get("ASYNC_REQUESTS_SEMAPHORE"))
 
     # Database
     SQLALCHEMY_DATABASE_URI = environ.get("SQLALCHEMY_DATABASE_URI")
