@@ -29,9 +29,9 @@ class RecordPool:
         sem = asyncio.Semaphore(app.config.get("ASYNC_REQUESTS_SEMAPHORE"))
 
         async def request(endpoint, s) -> None:
-            cr, item_id, cache = endpoint
+            cr, item_id = endpoint
             await sem.acquire()
-            await cr(s, item_id=item_id, cache=cache)
+            await cr(s, item_id=item_id)
             sem.release()
 
         async with aiohttp.ClientSession() as session:

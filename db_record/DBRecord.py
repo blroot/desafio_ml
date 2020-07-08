@@ -7,5 +7,8 @@ class DBRecord:
     def save(self):
         pass
 
+    def load_stages(self):
+        pass
+
     def end_pipeline(self, ml_api):
         pass

@@ -19,7 +19,7 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(file_record)
 
     def retrieve_item(self, ml_api):
-        item_async = ml_api.items.get(item_id=self.file_record.render(), cache=True)
+        item_async = ml_api.items.get(item_id=self.file_record.render())
         return True, [item_async]
 
     def retrieve_all_details(self, ml_api) -> (bool, List):
@@ -40,9 +40,9 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         self.category_id = item['body']['category_id']
         self.user_id = item['body']['seller_id']
 
-        currency_async = ml_api.currencies.get(item_id=item['body']['currency_id'], cache=True)
-        category_async = ml_api.categories.get(item_id=item['body']['category_id'], cache=True)
-        user_async = ml_api.users.get(item_id=item['body']['seller_id'], cache=True)
+        currency_async = ml_api.currencies.get(item_id=item['body']['currency_id'])
+        category_async = ml_api.categories.get(item_id=item['body']['category_id'])
+        user_async = ml_api.users.get(item_id=item['body']['seller_id'])
 
         return True, [currency_async, category_async, user_async]
 
