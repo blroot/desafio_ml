@@ -1,7 +1,6 @@
 from db_record.DBRecord import DBRecord
 from csvupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
 from typing import Iterable, List, Dict, Coroutine
-import requests
 
 
 class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
@@ -19,11 +18,11 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         self.item_id = ""
         super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(file_record)
 
-    def pre_transform(self, ml_api=None):
+    def retrieve_item(self, ml_api):
         item_async = ml_api.items.get(item_id=self.file_record.render(), cache=True)
         return True, [item_async]
 
-    def transform(self, ml_api=None) -> (bool, List):
+    def retrieve_all_details(self, ml_api) -> (bool, List):
         if not (self._transform_id() and self._transform_site()):
             return False, []
 
@@ -47,7 +46,7 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
 
         return True, [currency_async, category_async, user_async]
 
-    def resolve_async(self, ml_api=None):
+    def end_pipeline(self, ml_api):
         self.description = ml_api.currencies.get_from_cache(item_id=self.currency_id)['description']
         self.name = ml_api.categories.get_from_cache(item_id=self.category_id)['name']
         self.nickname = ml_api.users.get_from_cache(item_id=self.user_id)['nickname']
@@ -63,6 +62,9 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         except ValueError:
             return False
         return True
+
+    def load_stages(self):
+        self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details
 
     def save(self, ml_api=None):
         new_record = SiteIdPriceStartTimeNameDescriptionNickname(

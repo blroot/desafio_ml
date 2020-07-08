@@ -1,4 +1,4 @@
-from flask import request, Response
+from flask import request, Response, jsonify
 from flask import current_app as app
 from FileReader import FileReader
 from StreamParserFactory import StreamParserFactory
@@ -24,9 +24,9 @@ def upload() -> str:
     record_pool = RecordPool(ml_api=ml_api)
     for file_record in file_reader.read_line():
         db_record = SiteIdPriceStartTimeNameDescriptionNicknameRecord(file_record)
+        db_record.load_stages()
         record_pool.records.append(db_record)
-    record_pool.run_all_pre_transforms()
-    record_pool.run_all_transforms()
+    record_pool.run_all_pipelines()
     record_pool.save_all_records()
     end_time = datetime.datetime.now()
-    return Response(str((end_time-start_time).total_seconds()), status=200)
+    return jsonify({"time": str((end_time-start_time).total_seconds())})

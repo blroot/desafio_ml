@@ -1,5 +1,4 @@
 from .Endpoint import Endpoint
-from urllib.parse import urlencode
 
 
 class ItemsEndpoint(Endpoint):

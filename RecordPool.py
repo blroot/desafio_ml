@@ -9,24 +9,21 @@ class RecordPool:
         self.records = []
         self._ml_api = ml_api
 
-    def run_all_pre_transforms(self):
+    def run_all_pipelines(self):
         all_coroutines = []
+        number_of_stages = len(self.records[0].tasks_pipeline)
 
-        for record in self.records:
-            record.transform_success, record_coroutines = record.pre_transform(self._ml_api)
-            all_coroutines += record_coroutines
-        asyncio.run(self.request_aio(all_coroutines))
-
-    def run_all_transforms(self):
-        all_coroutines = []
-
-        for record in self.records:
-            record.transform_success, record_coroutines = record.transform(self._ml_api)
-            all_coroutines += record_coroutines
-        asyncio.run(self.request_aio(all_coroutines))
+        for i in range(number_of_stages):
+            for record in self.records:
+                task = record.tasks_pipeline[i]
+                record.transform_success, record_coroutines = task(self._ml_api)
+                if (record.transform_success, record_coroutines) is not (False, None):
+                    all_coroutines += record_coroutines
+            asyncio.run(self.request_aio(all_coroutines))
+            all_coroutines = []
         for record in self.records:
             if record.transform_success:
-                record.resolve_async(self._ml_api)
+                record.end_pipeline(self._ml_api)
 
     async def request_aio(self, endpoints: Iterable[Coroutine]) -> None:
         sem = asyncio.Semaphore(app.config.get("ASYNC_REQUESTS_SEMAPHORE"))
