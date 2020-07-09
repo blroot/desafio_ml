@@ -14,8 +14,7 @@ class ItemsEndpoint(Endpoint):
         self._total_requests_pending += 1
         return self.cr_get, item_id
 
-    async def cr_get(self, session, item_id=None, semaphore=None):
-        await semaphore.acquire()
+    async def cr_get(self, session, item_id=None):
         self._multiget_url += "," + item_id
         self._item_counter += 1
         self._total_requests_pending -= 1
@@ -27,7 +26,6 @@ class ItemsEndpoint(Endpoint):
             local_multiget_url = self._multiget_url
             self._multiget_url = self.url + '/' + self.path + '?ids='
             self._item_counter = 0
-            semaphore.release()
 
             if cached_object is None:
                 resp = await session.get(local_multiget_url)
@@ -36,5 +34,3 @@ class ItemsEndpoint(Endpoint):
                 for i in items:
                     item_id = i['body']['id']
                     self.cache[item_id] = i
-        else:
-            semaphore.release()
