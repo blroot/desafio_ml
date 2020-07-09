@@ -19,20 +19,23 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(file_record)
 
     def retrieve_item(self, ml_api):
+        if not self._id_valid() or not self._site_valid():
+            self.cancel_pipeline()
+            return
+
         item_async = ml_api.items.get(item_id=self.file_record.render())
-        return True, [item_async]
+        return [item_async]
 
     def retrieve_all_details(self, ml_api) -> (bool, List):
-        if not (self._transform_id() and self._transform_site()):
-            return False, []
-
         item = ml_api.items.get_from_cache(item_id=self.file_record.render())
-        if item[0]['code'] != 200:
-            return False, []
+        if item['code'] != 200:
+            self.cancel_pipeline()
+            return
 
-        item = item[0]
         if 'price' not in item['body'].keys():
-            return False, []
+            self.cancel_pipeline()
+            return
+
         self.price = float(item['body']['price'])
         self.start_time = item['body']['start_time']
 
@@ -44,24 +47,22 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         category_async = ml_api.categories.get(item_id=item['body']['category_id'])
         user_async = ml_api.users.get(item_id=item['body']['seller_id'])
 
-        return True, [currency_async, category_async, user_async]
+        return [currency_async, category_async, user_async]
 
     def end_pipeline(self, ml_api):
         self.description = ml_api.currencies.get_from_cache(item_id=self.currency_id)['description']
         self.name = ml_api.categories.get_from_cache(item_id=self.category_id)['name']
         self.nickname = ml_api.users.get_from_cache(item_id=self.user_id)['nickname']
 
-    def _transform_site(self) -> bool:
-        if self.site not in ['MLB', 'MLA']:
-            return False
-        return True
+    def _site_valid(self) -> bool:
+        return self.site in ['MLB', 'MLA']
 
-    def _transform_id(self) -> bool:
+    def _id_valid(self) -> bool:
         try:
             self.id = int(self.id)
         except ValueError:
             return False
-        return True
+        return True and self.id != ''
 
     def load_stages(self):
         self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details

@@ -29,4 +29,9 @@ def upload() -> str:
     record_pool.run_all_pipelines()
     record_pool.save_all_records()
     end_time = datetime.datetime.now()
-    return jsonify({"time": str((end_time-start_time).total_seconds())})
+    return jsonify(
+        {
+            "time": str((end_time-start_time).total_seconds()),
+            "urls": ml_api.items.urls
+        }
+    )

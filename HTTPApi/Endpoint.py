@@ -10,7 +10,7 @@ class Endpoint:
     def get(self, item_id):
         return self.cr_get, item_id
 
-    async def cr_get(self, session, item_id=None):
+    async def cr_get(self, session, item_id=None, semaphore=None):
         url = self.url + '/' + self.path + '/' + str(item_id)
 
         cached_object = self.cache.get(url, None)
