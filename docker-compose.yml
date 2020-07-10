@@ -4,6 +4,7 @@ volumes:
   pg_data:
     driver: local
 
+
 services:
   postgres:
     restart: always
@@ -16,6 +17,10 @@ services:
       - pg_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  rabbitmq:
+    restart: always
+    image: rabbitmq:latest
 
   app:
     restart: always

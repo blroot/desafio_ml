@@ -1,10 +1,10 @@
-import aiohttp
-
-
 class Endpoint:
     def __init__(self, url, path):
         self.url = url
         self.path = path
+        self.cache = {}
+
+    def purge_cache(self):
         self.cache = {}
 
     def get(self, item_id):

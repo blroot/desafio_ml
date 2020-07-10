@@ -1,8 +1,26 @@
 from . import db
 
 
+class UploadStatus(db.Model):
+    __tablename__ = 'upload_status'
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    status = db.Column(
+        db.String(10),
+        index=False,
+        unique=False,
+    )
+    time_elapsed = db.Column(
+        db.Float,
+        primary_key=False,
+        default=0.0
+    )
+
+
 class SiteIdPriceStartTimeNameDescriptionNickname(db.Model):
-    __tablename__ = 'a_table'
+    __tablename__ = 'data'
     id = db.Column(
         db.Integer,
         primary_key=True

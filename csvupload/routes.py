@@ -1,37 +1,36 @@
-from flask import request, Response, jsonify
+from flask import request, jsonify, abort
 from flask import current_app as app
-from FileReader import FileReader
-from StreamParserFactory import StreamParserFactory
-from file_record.SiteAndIdRecord import SiteAndIdRecord
-from db_record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
-from RecordPool import RecordPool
-from CsvParser import CsvParser
 import configparser
-import datetime
-from HTTPApi.MLApi import MLApi
+from csvupload.models import db, UploadStatus
+from sqlalchemy.orm.exc import NoResultFound
+from .tasks import bg_task
+import string
+import random
 
 config = configparser.ConfigParser()
-parser_factory = StreamParserFactory()
-parser_factory.register_parser('csv', CsvParser)
 
 
-@app.route('/desafioml', methods=["POST"])
+@app.route('/uploadfile', methods=["POST"])
 def upload() -> str:
-    ml_api = MLApi("https://api.mercadolibre.com")
-    start_time = datetime.datetime.now()
-    file_reader = FileReader(parser_factory, SiteAndIdRecord)
-    file_reader.upload(request)
-    record_pool = RecordPool(ml_api=ml_api)
-    for file_record in file_reader.read_line():
-        db_record = SiteIdPriceStartTimeNameDescriptionNicknameRecord(file_record)
-        db_record.load_stages()
-        record_pool.records.append(db_record)
-    record_pool.run_all_pipelines()
-    record_pool.save_all_records()
-    end_time = datetime.datetime.now()
-    return jsonify(
-        {
-            "time": str((end_time-start_time).total_seconds()),
-            "urls": ml_api.items.urls
-        }
-    )
+    file = request.files['file']
+    file_name = ''.join(random.choice(string.ascii_letters) for i in range(10))
+    file_path = app.config.get("FILE_PATH")
+
+    file.save(file_path + file_name)
+
+    new_upload_status = UploadStatus(status='uploaded')
+    db.session.add(new_upload_status)
+    db.session.commit()
+
+    bg_task.delay(new_upload_status.id, file_name)
+
+    return jsonify({"upload_id": new_upload_status.id})
+
+
+@app.route('/uploadstatus/<int:upload_id>', methods=["GET"])
+def status(upload_id) -> str:
+    try:
+        upload_status = db.session.query(UploadStatus).filter(UploadStatus.id == upload_id).one()
+        return jsonify({"id": upload_id, "status": upload_status.status, "time_elapsed": upload_status.time_elapsed})
+    except NoResultFound:
+        abort(404)
