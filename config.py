@@ -13,8 +13,8 @@ class Config:
 
     # App config
     FILE_PATH = environ.get('FILE_PATH')
-    CHUNK_SIZE = int(environ.get('CHUNK_SIZE'))
     FILE_TYPE = environ.get('FILE_TYPE')
+    DELIMITER = environ.get('DELIMITER')
     ASYNC_REQUESTS_SEMAPHORE = int(environ.get("ASYNC_REQUESTS_SEMAPHORE"))
 
     # Database

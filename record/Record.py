@@ -1,6 +1,6 @@
-class DBRecord:
-    def __init__(self, file_record):
-        self.file_record = file_record
+class Record:
+    def __init__(self, values):
+        self.values = values
         self.continue_pipeline = True
         self.tasks_pipeline = ()
 

@@ -1,12 +1,12 @@
-from db_record.DBRecord import DBRecord
+from record.Record import Record
 from csvupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
 from typing import Iterable, List, Dict, Coroutine
 
 
-class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
-    def __init__(self, file_record):
-        self.site = file_record.values[0]
-        self.id = file_record.values[1]
+class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
+    def __init__(self, values):
+        self.site = values[0]
+        self.id = values[1]
         self.price = ""
         self.start_time = ""
         self.name = ""
@@ -16,18 +16,18 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
         self.category_id = ""
         self.user_id = ""
         self.item_id = ""
-        super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(file_record)
+        super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(values)
 
     def retrieve_item(self, ml_api):
         if not self._id_valid() or not self._site_valid():
             self.cancel_pipeline()
             return
 
-        item_async = ml_api.items.get(item_id=self.file_record.render())
+        item_async = ml_api.items.get(item_id=self._item_id())
         return [item_async]
 
     def retrieve_all_details(self, ml_api) -> (bool, List):
-        item = ml_api.items.get_from_cache(item_id=self.file_record.render())
+        item = ml_api.items.get_from_cache(item_id=self._item_id())
         if item['code'] != 200:
             self.cancel_pipeline()
             return
@@ -64,10 +64,13 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(DBRecord):
             return False
         return True and self.id != ''
 
+    def _item_id(self) -> str:
+        return self.site + str(self.id)
+
     def load_stages(self):
         self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details
 
-    def save(self, ml_api=None):
+    def save(self):
         new_record = SiteIdPriceStartTimeNameDescriptionNickname(
             site=self.site,
             item_id=self.id,

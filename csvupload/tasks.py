@@ -1,11 +1,11 @@
 from csvupload import celery
 import datetime
-from db_record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
+from record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
 from RecordPool import RecordPool
 from csvupload.models import db, UploadStatus
 from FileReader import FileReader
 from csvupload import parser_factory
-from file_record.SiteAndIdRecord import SiteAndIdRecord
+from record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
 from HTTPApi.MLApi import MLApi
 
 
@@ -14,13 +14,12 @@ def bg_task(upload_id, file_name):
     ml_api = MLApi("https://api.mercadolibre.com")
     upload_status = db.session.query(UploadStatus).filter(UploadStatus.id == upload_id).one()
 
-    file_reader = FileReader(parser_factory, SiteAndIdRecord, file_name)
+    file_reader = FileReader(parser_factory, SiteIdPriceStartTimeNameDescriptionNicknameRecord, file_name)
 
     start_time = datetime.datetime.now()
 
     record_pool = RecordPool(ml_api=ml_api)
-    for file_record in file_reader.read_line():
-        db_record = SiteIdPriceStartTimeNameDescriptionNicknameRecord(file_record)
+    for db_record in file_reader.read_line():
         db_record.load_stages()
         record_pool.records.append(db_record)
 

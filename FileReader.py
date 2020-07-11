@@ -5,9 +5,8 @@ import os
 class FileReader:
     def __init__(self, parser_factory, record_format, file_name):
         self.file_name = file_name
-        self.chunk_size = app.config.get("CHUNK_SIZE")
         self.file_path = app.config.get("FILE_PATH")
-        self.parser = parser_factory.get_parser(app.config.get("FILE_TYPE"))()
+        self.parser = parser_factory.get_parser(app.config.get("FILE_TYPE"))
         self.record_format = record_format
 
     """

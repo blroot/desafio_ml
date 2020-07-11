@@ -1,13 +1,10 @@
 from flask import request, jsonify, abort
 from flask import current_app as app
-import configparser
 from csvupload.models import db, UploadStatus
 from sqlalchemy.orm.exc import NoResultFound
 from .tasks import bg_task
 import string
 import random
-
-config = configparser.ConfigParser()
 
 
 @app.route('/uploadfile', methods=["POST"])

@@ -2,12 +2,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
 from config import Config
-from StreamParserFactory import StreamParserFactory
-from CsvParser import CsvParser
+from parsers.StreamParserFactory import StreamParserFactory
+from parsers.CsvParser import CsvParser
 
 db = SQLAlchemy()
 celery = Celery(broker=Config.CELERY_BROKER_URL)
-parser_factory = StreamParserFactory()
+parser_factory = StreamParserFactory(delimiter=Config.DELIMITER)
 parser_factory.register_parser('csv', CsvParser)
 
 
