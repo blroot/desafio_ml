@@ -1,0 +1,14 @@
+FROM python:3.8
+
+ARG CELERY_BROKER_URL
+ARG CELERY_RESULT_BACKEND
+
+ENV CELERY_BROKER_URL ${CELERY_BROKER_URL}
+ENV CELERY_RESULT_BACKEND ${CELERY_RESULT_BACKEND}
+
+RUN apt-get update
+RUN mkdir /app
+WORKDIR /app
+COPY /requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+CMD ["celery", "-A", "celery_worker.celery", "worker"]
