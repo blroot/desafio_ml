@@ -2,8 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
 from config import Config
-from parsers.StreamParserFactory import StreamParserFactory
-from parsers.CsvParser import CsvParser
+from filereader.parsers.StreamParserFactory import StreamParserFactory
+from filereader.parsers.CsvParser import CsvParser
 
 db = SQLAlchemy()
 celery = Celery(broker=Config.CELERY_BROKER_URL)

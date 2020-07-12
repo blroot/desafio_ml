@@ -1,4 +1,4 @@
-from csvupload import celery, create_app
+from fileupload import celery, create_app
 
 app = create_app()
 app.app_context().push()

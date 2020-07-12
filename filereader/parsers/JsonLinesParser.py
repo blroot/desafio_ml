@@ -1,4 +1,4 @@
-from parsers.Parser import Parser
+from filereader.parsers.Parser import Parser
 import json
 
 

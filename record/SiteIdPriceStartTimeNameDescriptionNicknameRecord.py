@@ -1,5 +1,5 @@
 from record.Record import Record
-from csvupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
+from fileupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
 from typing import Iterable, List, Dict, Coroutine
 
 

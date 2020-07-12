@@ -1,10 +1,9 @@
-from csvupload import celery
+from fileupload import celery
 import datetime
-from record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
-from RecordPool import RecordPool
-from csvupload.models import db, UploadStatus
-from FileReader import FileReader
-from csvupload import parser_factory
+from record.RecordPool import RecordPool
+from fileupload.models import db, UploadStatus
+from filereader.FileReader import FileReader
+from fileupload import parser_factory
 from record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
 from HTTPApi.MLApi import MLApi
 

@@ -1,6 +1,6 @@
 from flask import request, jsonify, abort
 from flask import current_app as app
-from csvupload.models import db, UploadStatus
+from fileupload.models import db, UploadStatus
 from sqlalchemy.orm.exc import NoResultFound
 from .tasks import bg_task
 import string
