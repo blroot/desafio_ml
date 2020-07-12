@@ -1,5 +1,6 @@
 from fileupload import celery
 import datetime
+from flask import current_app as app
 from record.RecordPool import RecordPool
 from fileupload.models import db, UploadStatus
 from filereader.FileReader import FileReader
@@ -10,7 +11,7 @@ from HTTPApi.MLApi import MLApi
 
 @celery.task()
 def bg_task(upload_id, file_name):
-    ml_api = MLApi("https://api.mercadolibre.com")
+    ml_api = MLApi("https://api.mercadolibre.com", app.config.get("ASYNC_REQUESTS_SEMAPHORE"))
     upload_status = db.session.query(UploadStatus).filter(UploadStatus.id == upload_id).one()
 
     file_reader = FileReader(parser_factory, SiteIdPriceStartTimeNameDescriptionNicknameRecord, file_name)

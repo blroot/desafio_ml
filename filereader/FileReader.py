@@ -9,19 +9,6 @@ class FileReader:
         self.parser = parser_factory.get_parser(app.config.get("FILE_TYPE"))
         self.record_format = record_format
 
-    """
-    def upload(self, request):
-        file = request.files['file']
-        file.save(self.file_path + self.file_name)
-
-        with open(self.file_path + self.file_name, "bw") as f:
-            while True:
-                chunk = request.stream.read(int(self.chunk_size))
-                if len(chunk) == 0:
-                    return
-                f.write(chunk)
-    """
-
     def read_line(self):
         with open(self.file_path + self.file_name, "r") as f:
             reader = self.parser.reader(f)

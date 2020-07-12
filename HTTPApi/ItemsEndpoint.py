@@ -10,16 +10,19 @@ class ItemsEndpoint(Endpoint):
         self._multiget_url = self.url + '/' + self.path + '?ids='
         self.urls = []
 
-    def get(self, item_id):
+    def get(self, item_id, extra_args=None):
         self._total_requests_pending += 1
-        return self.cr_get, item_id
+        return self.cr_get, item_id, extra_args
 
-    async def cr_get(self, session, item_id=None):
+    async def cr_get(self, session, item_id=None, extra_args=None):
         self._multiget_url += "," + item_id
         self._item_counter += 1
         self._total_requests_pending -= 1
 
         if self._item_counter == 20 or self._total_requests_pending == 0:
+            if extra_args:
+                self._multiget_url += '&id,' + extra_args
+
             self.urls.append(self._multiget_url)
             cached_object = self.cache.get(item_id, None)
 
