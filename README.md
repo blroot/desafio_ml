@@ -55,16 +55,16 @@ Utiliza los parsers para parsear y construír un Record con cada una.
 
 Cada parser implementa dos métodos por herencia:
 
-- reader(file_object): se encarga de parsear una linea del archivo, retorna un generador, para csv, adapta csv.reader
+- reader(file_object): se encarga de parsear una linea del archivo, es un generador, para csv, adapta csv.reader
 - build_record(values, record_class): devuelve un Record con los valores y la clase que hereda de Record que le pasamos
-
-### Flask app
-
-En el módulo fileupload se encuentra la app de flask, 
 
 ### Módulo record
 
 El proceso se pensó como un pipeline por etapas, en cada etapa se pueden hacer consultas a la API de mercadolibre mediante las abstracciones diseñadas para tal fin, es importante remarcar que el resultado de la consulta siempre va a estar disponible una etapa mas tarde en la caché del endpoint, esto permite agrupar las consultas del mismo tipo para todos los records para poder hacer los pedidos a la api de manera asincrónica, logrando una aceleración importante.
+
+De manera mas gráfica, los requests de una etapa que consulta items, podría verse de esta manera sobre una linea de tiempo
+
+![](async.jpg)
 
 #### Record 
 
@@ -110,8 +110,29 @@ Luego, como siempre tenemos end_pipeline y save donde se guardan los datos en BD
 
 #### RecordPool 
 
-Es una clase que agrupa los records y desde aquí se corre todo el pipeline y se guardan todos los resultados en BD.
+Es una clase que agrupa los records y desde aquí se corren todos los pipelines y se guardan todos los resultados en BD.
  
 En el método run_all_pipelines() 
 
 ![](recordpool.jpg)
+
+### Flask app
+
+En el módulo fileupload se encuentra la app de flask.
+
+#### models
+
+Aquí definimos los modelos para la base de datos
+
+#### tasks
+
+Aquí se define la tarea de celery, se utilizan todas las abstracciones construídas (MLApi, FileReader, RecordPool) para leer el archivo de disco, parsearlo, llenar el RecordPool y correr todo.
+Se decidió hacerlo de esta manera con la idea de poder correr este proceso pesado en background, posibilitando también tener varios workers donde correrlo, además permite finalizar el request una vez que se sube el archivo al servidor.
+
+#### routes
+
+Acá se definen las dos rutas que componen la app, /uploadfile para subir el archivo y /uploadstatus/<upload_id> para poder consultar el estado de un proceso
+
+
+
+
