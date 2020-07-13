@@ -1,8 +1,9 @@
 import asyncio
+from HTTPApi.MLApi import MLApi
 
 
 class RecordPool:
-    def __init__(self, ml_api=None):
+    def __init__(self, ml_api: MLApi):
         self.records = []
         self._ml_api = ml_api
 

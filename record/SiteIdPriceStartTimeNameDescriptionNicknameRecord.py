@@ -1,7 +1,7 @@
 from record.Record import Record
 from fileupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
 from HTTPApi.MLApi import MLApi
-from typing import Iterable, Tuple, List
+from typing import Tuple, List
 
 
 class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
@@ -19,17 +19,17 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
         self.item_id = ""
         super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(values)
 
-    def retrieve_item(self, ml_api: MLApi) -> Iterable[Tuple] or None:
+    def retrieve_item(self, ml_api: MLApi) -> List[Tuple] or None:
         if not self._id_valid() or not self._site_valid():
             self.cancel_pipeline()
             return
 
-        item_async = ml_api.items.get(item_id=self._item_id(),
+        item_async = ml_api.items.get(element_id=self._item_id(),
                                       extra_args='attributes=price,start_time,currency_id,category_id,seller_id')
         return [item_async]
 
-    def retrieve_all_details(self, ml_api: MLApi) -> Iterable or None:
-        item = ml_api.items.get_from_cache(item_id=self._item_id())
+    def retrieve_all_details(self, ml_api: MLApi) -> List[Tuple] or None:
+        item = ml_api.items.get_from_cache(element_id=self._item_id())
         if item['code'] != 200:
             self.cancel_pipeline()
             return
@@ -45,16 +45,19 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
         self.category_id = item['body']['category_id']
         self.user_id = item['body']['seller_id']
 
-        currency_async = ml_api.currencies.get(item_id=item['body']['currency_id'], extra_args='attributes=description')
-        category_async = ml_api.categories.get(item_id=item['body']['category_id'], extra_args='attributes=name')
-        user_async = ml_api.users.get(item_id=item['body']['seller_id'], extra_args='attributes=nickname')
+        currency_async = ml_api.currencies.get(element_id=item['body']['currency_id'],
+                                               extra_args='attributes=description')
+        category_async = ml_api.categories.get(element_id=item['body']['category_id'],
+                                               extra_args='attributes=name')
+        user_async = ml_api.users.get(element_id=item['body']['seller_id'],
+                                      extra_args='attributes=nickname')
 
         return [currency_async, category_async, user_async]
 
     def end_pipeline(self, ml_api: MLApi):
-        self.description = ml_api.currencies.get_from_cache(item_id=self.currency_id)['description']
-        self.name = ml_api.categories.get_from_cache(item_id=self.category_id)['name']
-        self.nickname = ml_api.users.get_from_cache(item_id=self.user_id)['nickname']
+        self.description = ml_api.currencies.get_from_cache(element_id=self.currency_id)['description']
+        self.name = ml_api.categories.get_from_cache(element_id=self.category_id)['name']
+        self.nickname = ml_api.users.get_from_cache(element_id=self.user_id)['nickname']
 
     def _site_valid(self) -> bool:
         return self.site in ['MLB', 'MLA']

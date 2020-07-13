@@ -25,9 +25,13 @@ def upload() -> str:
 
 
 @app.route('/uploadstatus/<int:upload_id>', methods=["GET"])
-def status(upload_id) -> str:
+def status(upload_id: int) -> str:
     try:
         upload_status = db.session.query(UploadStatus).filter(UploadStatus.id == upload_id).one()
-        return jsonify({"id": upload_id, "status": upload_status.status, "time_elapsed": upload_status.time_elapsed})
+        return jsonify({"id": upload_id,
+                        "status": upload_status.status,
+                        "time_elapsed": upload_status.time_elapsed,
+                        "details": upload_status.details
+                        })
     except NoResultFound:
         abort(404)

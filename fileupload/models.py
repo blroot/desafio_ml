@@ -12,6 +12,11 @@ class UploadStatus(db.Model):
         index=False,
         unique=False,
     )
+    details = db.Column(
+        db.String(100),
+        index=False,
+        unique=False,
+    )
     time_elapsed = db.Column(
         db.Float,
         primary_key=False,

@@ -7,10 +7,11 @@ from filereader.FileReader import FileReader
 from fileupload import parser_factory
 from record.SiteIdPriceStartTimeNameDescriptionNicknameRecord import SiteIdPriceStartTimeNameDescriptionNicknameRecord
 from HTTPApi.MLApi import MLApi
+from HTTPApi.Exceptions import ApiConnectionError
 
 
 @celery.task()
-def bg_task(upload_id, file_name):
+def bg_task(upload_id: int, file_name: str):
     ml_api = MLApi("https://api.mercadolibre.com", app.config.get("ASYNC_REQUESTS_SEMAPHORE"))
     upload_status = db.session.query(UploadStatus).filter(UploadStatus.id == upload_id).one()
 
@@ -26,7 +27,14 @@ def bg_task(upload_id, file_name):
     upload_status.status = 'running'
     db.session.commit()
 
-    record_pool.run_all_pipelines()
+    try:
+        record_pool.run_all_pipelines()
+    except ApiConnectionError as e:
+        upload_status.status = 'failed'
+        upload_status.details = str(e)
+        db.session.commit()
+        file_reader.remove_file()
+        return
 
     record_pool.save_all_records()
 

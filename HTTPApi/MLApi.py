@@ -1,12 +1,12 @@
 from HTTPApi.Endpoint import Endpoint
 from HTTPApi.ItemsEndpoint import ItemsEndpoint
-from typing import Iterable, Coroutine
+from typing import Iterable, List
 import asyncio
 import aiohttp
 
 
 class MLApi:
-    def __init__(self, url, async_limit):
+    def __init__(self, url: str, async_limit: int):
         self.url = url
         self.items = ItemsEndpoint(url, 'items')
         self.currencies = Endpoint(url, 'currencies')
@@ -14,13 +14,13 @@ class MLApi:
         self.users = Endpoint(url, 'users')
         self.async_limit = async_limit
 
-    async def request_aio(self, endpoints: Iterable[Coroutine]) -> None:
+    async def request_aio(self, endpoints: Iterable[List]) -> None:
         sem = asyncio.Semaphore(self.async_limit)
 
         async def request(endpoint, s) -> None:
-            cr, item_id, extra_args = endpoint
+            coroutine, element_id, extra_args = endpoint
             await sem.acquire()
-            await cr(s, item_id=item_id, extra_args=extra_args)
+            await coroutine(s, element_id=element_id, extra_args=extra_args)
             sem.release()
 
         async with aiohttp.ClientSession() as session:

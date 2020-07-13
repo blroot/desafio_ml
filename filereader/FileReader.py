@@ -1,9 +1,12 @@
 from flask import current_app as app
+from filereader.parsers import StreamParserFactory
+from record.Record import Record
+from typing import Type
 import os
 
 
 class FileReader:
-    def __init__(self, parser_factory, record_format, file_name):
+    def __init__(self, parser_factory: StreamParserFactory, record_format: Type[Record], file_name: str):
         self.file_name = file_name
         self.file_path = app.config.get("FILE_PATH")
         self.parser = parser_factory.get_parser(app.config.get("FILE_TYPE"))

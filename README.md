@@ -110,15 +110,14 @@ Luego, como siempre tenemos end_pipeline y save donde se guardan los datos en BD
 
 #### RecordPool 
 
-Es una clase que agrupa los records y desde aquí se corren todos los pipelines y se guardan todos los resultados en BD.
- 
-En el método run_all_pipelines() 
+Es una clase que agrupa los records y tiene los métodos para correr todos los pipelines y guardar todos los resultados en BD.
+
 
 ![](recordpool.jpg)
 
 ### Flask app
 
-En el módulo fileupload se encuentra la app de flask.
+En el módulo fileupload se encuentra la app de flask. En su __init__ se construyen los parsers, el objeto de SQLAlchemy, el objeto celery y la app flask.
 
 #### models
 
@@ -133,6 +132,57 @@ Se decidió hacerlo de esta manera con la idea de poder correr este proceso pesa
 
 Acá se definen las dos rutas que componen la app, /uploadfile para subir el archivo y /uploadstatus/<upload_id> para poder consultar el estado de un proceso
 
+### Configuración
 
+Se hace mediante un archivo .env en la raíz del proyecto, por practicidad ya se provee uno en el repositorio.
 
+#### Variables
 
+#### POSTGRES_USER
+
+Es el usuario que se va a utilizar para conectarse a la BD PostgreSQL
+
+#### POSTGRES_PASSWORD
+
+Es la contraseña que se va a utilizar para conectarse a la BD PostgreSQL
+
+#### POSTGRES_DB
+
+El nombre de la BD que se utilizará para la app
+
+#### FILE_PATH
+
+Ruta dentro del servidor donde se suben los archivos
+
+#### FILE_TYPE
+
+Tipo de archivo que se va a subir en el endpoint (csv, jsonl o txt)
+
+#### DELIMITER
+
+Delimitador que se utilizará para separar csv o txt, no se utiliza para jsonl
+
+#### FLASK_APP
+
+Módulo que contiene el proyecto de flask
+
+#### FLASK_ENV
+
+Indica que tipo de entorno se utilizará para flask (development o production)
+
+#### ASYNC_REQUESTS_SEMAPHORE
+
+Semáforo contador para limitar el acceso a recursos de red del servidor al hacer requests asincrónicos.
+En la config de ejemplo se configura en 1000, según el valor podrían presentarse problemas en los workers donde correrán las tareas.
+
+#### SQLALCHEMY_DATABASE_URI
+
+Variable de entorno de SQLAlchemy, URI a la BD postgres
+
+#### CELERY_RESULT_BACKEND
+
+URI al message broker
+
+#### CELERY_BROKER_URL
+
+URI al message broker
