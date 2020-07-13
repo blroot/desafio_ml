@@ -25,6 +25,8 @@ services:
 
   app:
     restart: always
+    depends_on:
+      - postgres
     build: .
     ports:
       - 5000:5000
