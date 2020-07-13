@@ -2,6 +2,8 @@
 
 ## Quick Start
 
+Los contenedores exponen los puertos 5000 para flask y 5432 para la base de datos postgres
+
 Para levantar el proyecto con docker-compose, en la raíz del proyecto:
 
 ```
@@ -33,7 +35,7 @@ Se decidió utilizar celery y rabbitmq para correr la tarea en background y no d
 
 ### Abstracción de la API de ML
 
-En el módulo HTTPApi, se diseñó una abstracción para poder consultar al backend de Meli, se pensó en una clase Endpoint en donde cada uno tiene su propio caché, donde se guardan los resultado de las consultas.
+En el módulo HTTPApi, se diseñó una abstracción para poder consultar al backend de Meli, se pensó en una clase Endpoint en donde cada uno tiene su propio caché, donde se guardan los resultados de las consultas.
 Para el endpoint de items se aprovechó el multiget de 20 items simultaneos para optimizar las consultas.
 Se utiliza un semáforo configurable para evitar sobrecargar los recursos de red del sistema operativo y/o ser limitados por el backend.
 
@@ -85,8 +87,9 @@ estos métodos deben retornar una lista con todos los resultados de MLApi.Endpoi
                                       extra_args='attributes=price,start_time,currency_id,category_id,seller_id')
         return [item_async]
  ```
-Dicha lista va a ser utilizada por el RecordPool para unificar todas las consultas 
+Dicha lista va a ser utilizada por el RecordPool para unificar todas las consultas.
 
+Si se necesita interrumpir la ejecución en alguna etapa, se llama a cancel_pipeline() y se retorna.
 
 En la etapa siguiente, se puede leer el resultado de dicha consulta con get_from_cache():
  
@@ -107,7 +110,8 @@ Luego, como siempre tenemos end_pipeline y save donde se guardan los datos en BD
 
 #### RecordPool 
 
-Es una clase que agrupa los records y desde aquí se corre todo el pipeline y se guardan todos los resultados en BD 
+Es una clase que agrupa los records y desde aquí se corre todo el pipeline y se guardan todos los resultados en BD.
+ 
 En el método run_all_pipelines() 
 
 ![](recordpool.jpg)
