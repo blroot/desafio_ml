@@ -10,6 +10,7 @@ class StreamParserFactory:
     def register_parser(self, type_format: str, parser: Type[Parser]):
         """
         Permite registrar un Parser asociado a una extensión determinada
+
         :param type_format: Extensión de archivo
         :param parser: Clase correspondiente al Parser
         """
@@ -18,6 +19,7 @@ class StreamParserFactory:
     def get_parser(self, type_format: str):
         """
         Devuelve un objeto parser construído
+
         :param type_format: Extensión de archivo
         :return: Objeto Parser
         """

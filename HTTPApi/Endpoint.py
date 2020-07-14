@@ -17,8 +17,8 @@ class Endpoint:
 
     def get(self, element_id: str, extra_args: str = None):
         """
-        Se utiliza para pedir una consulta al backend, pero no devuelve la respuesta del servidor
-        sinó lo necesario para ejecutar la función asincrónica que lo hace
+        Se utiliza para pedir una consulta al backend, pero no devuelve la respuesta del servidor sinó lo necesario para ejecutar la función asincrónica que lo hace
+
         :param element_id: Identificador del elemento que vamos a pedir al endpoint de la API
         :param extra_args: Para pasarle argumentos extra a la url
         :return: Tupla con función asincrónica y sus argumentos
@@ -28,6 +28,7 @@ class Endpoint:
     async def cr_get(self, session: ClientSession, element_id: str = None, extra_args: str = None):
         """
         Función asíncrónica para hacer una consulta al backend o traerlo de caché si se encuentra
+
         :rtype: None
         :param session: Una sesión abierta de aiohttp
         :param element_id: Identificador del elemento que vamos a pedir al endpoint de la API
@@ -50,6 +51,7 @@ class Endpoint:
     def get_from_cache(self, element_id: str = None):
         """
         Para consultar a la caché por un elemento
+
         :param element_id: Identificador del elemento que pedimos con anterioridad a la API
         :return: Diccionario con respuesta del backend
         """

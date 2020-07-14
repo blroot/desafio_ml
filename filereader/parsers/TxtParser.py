@@ -8,6 +8,7 @@ class TxtParser(Parser):
     def reader(self, file_object):
         """
         Generador, remueve el salto de linea y separa el texto según el separador configurado
+
         :param file_object: El objeto file
         """
         for line in file_object:

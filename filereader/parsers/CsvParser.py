@@ -10,6 +10,7 @@ class CsvParser(Parser):
     def reader(self, file_object: TextIO):
         """
         Método que adapta el generador de csv.reader para leer linea a linea
+
         :param file_object: El objeto file
         :return: csv.reader
         """

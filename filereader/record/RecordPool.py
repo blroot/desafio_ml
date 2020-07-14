@@ -10,7 +10,9 @@ class RecordPool:
 
     def main_loop(self, file_reader):
         """
-        Es el loop principal del sistema, carga N (size) records al pool, para cada uno corre su pipeline, guarda los datos y purga caches
+        Es el loop principal del sistema, carga N (size) records al pool, para cada uno corre su pipeline,
+        guarda los datos y purga caches
+
         :param file_reader: Instancia de FileReader
         """
         file_reader_generator = file_reader.read_line()

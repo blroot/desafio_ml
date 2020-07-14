@@ -18,6 +18,7 @@ class ItemsEndpoint(Endpoint):
         Se utiliza para pedir una consulta al backend, pero no devuelve la respuesta del servidor
         sinó lo necesario para ejecutar la función asincrónica que lo hace, incrementa la cantidad total
         de peticiones pendientes para optimizar con multiget luego.
+
         :param element_id: Identificador del elemento que vamos a pedir al endpoint de la API
         :param extra_args: Para pasarle argumentos extra a la url
         :return: Tupla con función asincrónica y sus argumentos
@@ -29,6 +30,7 @@ class ItemsEndpoint(Endpoint):
         """
         Función asíncrónica para hacer una consulta al backend o traerlo de caché si se encuentra, no le pega al
         backend hasta que la url no tenga 20 elementos (límite de multiget Meli para items)
+
         :rtype: None
         :param session: Una sesión abierta de aiohttp
         :param element_id: Identificador del elemento que vamos a pedir al endpoint de la API

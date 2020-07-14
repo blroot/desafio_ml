@@ -7,14 +7,14 @@ class Record:
     def end_pipeline(self, ml_api):
         """
         Implementar, anteúltima etapa del pipeline, donde se pueden consultar datos a caché
+
         :param ml_api: Instancia de MLApi
         """
         pass
 
     def save(self):
         """
-        Tiene que implementarse para salvar los datos en BD
-        Última etapa del pipeline
+        Tiene que implementarse para salvar los datos en BD. Última etapa del pipeline
         """
         pass
 
