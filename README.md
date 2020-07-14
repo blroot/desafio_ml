@@ -120,7 +120,7 @@ Luego, como siempre tenemos end_pipeline y save donde se guardan los datos en BD
 #### RecordPool 
 
 Es una clase que agrupa los records y tiene los métodos para correr todos los pipelines y guardar todos los resultados en BD.
-Tiene un tamaño determinado por configuración para manejar una cantidad fija de Records a la vez para no agotar la memoria del SO.
+Tiene un tamaño determinado por configuración para manejar una cantidad fija de Records a la vez para no agotar la memoria del SO, en general cuanto mas grande, mas rápida va a ser la ejecución, pero logicamente va a usar mas memoria.
 
 ![](recordpool.jpg)
 
