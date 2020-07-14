@@ -15,6 +15,7 @@ class Config:
     FILE_PATH = environ.get('FILE_PATH')
     FILE_TYPE = environ.get('FILE_TYPE')
     DELIMITER = environ.get('DELIMITER')
+    RECORD_POOL_SIZE = int(environ.get("RECORD_POOL_SIZE"))
     ASYNC_REQUESTS_SEMAPHORE = int(environ.get("ASYNC_REQUESTS_SEMAPHORE"))
 
     # Database

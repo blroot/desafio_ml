@@ -25,3 +25,9 @@ class MLApi:
 
         async with aiohttp.ClientSession() as session:
             await asyncio.gather(*[request(endpoint, session) for endpoint in endpoints])
+
+    def purge_all_caches(self):
+        self.items.purge_cache()
+        self.currencies.purge_cache()
+        self.categories.purge_cache()
+        self.users.purge_cache()

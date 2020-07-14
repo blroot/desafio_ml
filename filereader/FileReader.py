@@ -1,6 +1,6 @@
 from flask import current_app as app
 from filereader.parsers import StreamParserFactory
-from record.Record import Record
+from filereader.record.Record import Record
 from typing import Type
 import os
 
@@ -13,10 +13,16 @@ class FileReader:
         self.record_format = record_format
 
     def read_line(self):
+        """
+        Generador, abre el archivo subido y utiliza el Parser para construír un Record
+        """
         with open(self.file_path + self.file_name, "r") as f:
             reader = self.parser.reader(f)
             for row in reader:
                 yield self.parser.build_record(row, self.record_format)
 
     def remove_file(self):
+        """
+        Para borrar el archivo del disco
+        """
         os.remove(self.file_path + self.file_name)

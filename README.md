@@ -58,7 +58,9 @@ Cada parser implementa dos métodos por herencia:
 - reader(file_object): se encarga de parsear una linea del archivo, es un generador, para csv, adapta csv.reader
 - build_record(values, record_class): devuelve un Record con los valores y la clase que hereda de Record que le pasamos
 
-### Módulo record
+En la carpeta tests se encuentran algunos tests unitarios de los parsers
+
+#### Submódulo record
 
 El proceso se pensó como un pipeline por etapas, en cada etapa se pueden hacer consultas a la API de mercadolibre mediante las abstracciones diseñadas para tal fin, es importante remarcar que el resultado de la consulta siempre va a estar disponible una etapa mas tarde en la caché del endpoint, esto permite agrupar las consultas del mismo tipo para todos los records para poder hacer los pedidos a la api de manera asincrónica, logrando una aceleración importante.
 
@@ -78,7 +80,7 @@ Por ejemplo, para el ejercicio, en la clase SiteIdPriceStartTimeNameDescriptionN
 estos métodos deben retornar una lista con todos los resultados de MLApi.Endpoint.get():
  
  ```
-     def retrieve_item(self, ml_api: MLApi) -> Iterable[Tuple] or None:
+     def retrieve_item(self, ml_api: MLApi) -> List[Tuple] or None:
         if not self._id_valid() or not self._site_valid():
             self.cancel_pipeline()
             return
@@ -94,16 +96,15 @@ Si se necesita interrumpir la ejecución en alguna etapa, se llama a cancel_pipe
 En la etapa siguiente, se puede leer el resultado de dicha consulta con get_from_cache():
  
 ```
-    def retrieve_all_details(self, ml_api: MLApi) -> Iterable or None:
+    def retrieve_all_details(self, ml_api: MLApi) -> List[Tuple] or None:
         item = ml_api.items.get_from_cache(item_id=self._item_id())
         ....
 ```
 
-Para cargar los métodos que creamos como etapas, lo indicamos mediante load_stages():
+Para cargar los métodos que creamos como etapas, lo indicamos en el atributo tasks_pipeline:
 
 ```
-    def load_stages(self) -> None:
-        self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details
+self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details
 ```
 
 Luego, como siempre tenemos end_pipeline y save donde se guardan los datos en BD.
@@ -111,9 +112,11 @@ Luego, como siempre tenemos end_pipeline y save donde se guardan los datos en BD
 #### RecordPool 
 
 Es una clase que agrupa los records y tiene los métodos para correr todos los pipelines y guardar todos los resultados en BD.
-
+Tiene un tamaño determinado por configuración para manejar una cantidad fija de Records a la vez para no agotar la memoria del SO.
 
 ![](recordpool.jpg)
+
+El método main_loop(file_reader) toma como parámetro una instancia de FileReader y se encarga de cargar los records en el pool, para cada record correr su pipeline, guardar los datos en BD y purgar todas las caches de los endpoints.
 
 ### Flask app
 
@@ -169,6 +172,10 @@ Módulo que contiene el proyecto de flask
 #### FLASK_ENV
 
 Indica que tipo de entorno se utilizará para flask (development o production)
+
+#### RECORD_POOL_SIZE
+
+Cuantos records procesar al mismo tiempo, elegir una cantidad razonable para no tener problemas de memoria
 
 #### ASYNC_REQUESTS_SEMAPHORE
 

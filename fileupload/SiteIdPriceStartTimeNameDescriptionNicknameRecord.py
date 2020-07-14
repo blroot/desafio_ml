@@ -1,4 +1,4 @@
-from record.Record import Record
+from filereader.record.Record import Record
 from fileupload.models import db, SiteIdPriceStartTimeNameDescriptionNickname
 from HTTPApi.MLApi import MLApi
 from typing import Tuple, List
@@ -6,6 +6,7 @@ from typing import Tuple, List
 
 class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
     def __init__(self, values: List):
+        super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(values)
         self.site = values[0]
         self.id = values[1]
         self.price = ""
@@ -17,7 +18,7 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
         self.category_id = ""
         self.user_id = ""
         self.item_id = ""
-        super(SiteIdPriceStartTimeNameDescriptionNicknameRecord, self).__init__(values)
+        self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details
 
     def retrieve_item(self, ml_api: MLApi) -> List[Tuple] or None:
         if not self._id_valid() or not self._site_valid():
@@ -71,9 +72,6 @@ class SiteIdPriceStartTimeNameDescriptionNicknameRecord(Record):
 
     def _item_id(self) -> str:
         return self.site + str(self.id)
-
-    def load_stages(self) -> None:
-        self.tasks_pipeline = self.retrieve_item, self.retrieve_all_details
 
     def save(self) -> None:
         new_record = SiteIdPriceStartTimeNameDescriptionNickname(
