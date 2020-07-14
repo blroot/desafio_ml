@@ -13,6 +13,10 @@ docker-compose up -d
 Abrir [upload.html](upload.html) y subir el csv, si todo va bien el servidor nos va a responder con el id del upload, con ese id, por ejemplo 1, podemos ir a [http://localhost:5000/uploadstatus/1](http://localhost:5000/uploadstatus/1)
  nos va a mostrar el estado del proceso.
  
+## Documentación con docstring
+
+Se encuentra dentro de docs/build/html
+ 
 ## Decisiones de diseño
 
 El proyecto está hecho con varios contenedores docker:
